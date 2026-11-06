@@ -21,16 +21,19 @@ git clone https://github.com/DTTerastar/jcode-honcho ~/Code/jcode-honcho
 `install.sh` is idempotent. It writes:
 
 - `~/.jcode/mcp.json` — the `honcho` stdio MCP server entry
-- `~/.jcode/config.toml` — the four lifecycle hooks under `[hooks]`
+- `~/.jcode/config.toml` — the five lifecycle hooks under `[hooks]`
 - `~/.jcode/skills/honcho-*` — symlinks to the skills in this repo
 
 Restart Jcode afterward. `jcode mcp test honcho` verifies the connection.
 
 ### Requirements
 
-- [Bun](https://bun.sh) on `PATH` (the plugin runs TypeScript directly, no build step)
+- [Bun](https://bun.sh) on `PATH` when you run `install.sh` (the plugin runs TypeScript
+  directly, no build step). The installer writes bun's absolute path into the hook and MCP
+  commands, because Jcode runs them directly (no shell) from its server process, whose
+  `PATH` may not include `~/.bun/bin`. Re-run `install.sh` if bun moves.
 - A reachable Honcho API (hosted or self-hosted).
-- Dependencies: run `bun install` in the clone. `install.sh` warns if `node_modules` is
+- Dependencies: `install.sh` runs `bun install` if `node_modules` is
   missing.
 
 ## Configuration

@@ -24,13 +24,16 @@ say() { printf '%s\n' "$*"; }
 run() { if [ "$DRY" = 1 ]; then say "  would: $*"; else "$@"; fi; }
 
 command -v bun >/dev/null 2>&1 || { say "error: bun is required (https://bun.sh)"; exit 1; }
+# Jcode spawns hooks and MCP servers directly (no shell) from its server
+# process, whose PATH often lacks ~/.bun/bin. Write bun's absolute path.
+BUN="$(command -v bun)"
 [ -f "$ROOT/mcp-server.ts" ] || { say "error: $ROOT/mcp-server.ts missing"; exit 1; }
 [ -d "$ROOT/node_modules" ] || {
   if [ "$DRY" = 1 ]; then
     say "  would: bun install (dependencies not installed yet)"
   else
     say "dependencies not installed — running bun install"
-    ( cd "$ROOT" && bun install ) || { say "error: bun install failed"; exit 1; }
+    ( cd "$ROOT" && "$BUN" install ) || { say "error: bun install failed"; exit 1; }
     say ""
   fi
 }
@@ -39,6 +42,7 @@ mkdir -p "$JCODE_DIR" "$SKILLS_DIR"
 
 say "honcho plugin: $ROOT"
 say "jcode home:    $JCODE_DIR"
+say "bun:           $BUN"
 say ""
 
 # --- mcp.json -------------------------------------------------------------
@@ -46,7 +50,7 @@ say "mcp server -> $MCP_JSON"
 merge_mcp() {
   bun -e '
 const fs = require("fs");
-const [path, root] = process.argv.slice(1);
+const [path, root, bun] = process.argv.slice(1);
 let cfg = {};
 if (fs.existsSync(path)) {
   try { cfg = JSON.parse(fs.readFileSync(path, "utf-8")); } catch { cfg = {}; }
@@ -54,15 +58,15 @@ if (fs.existsSync(path)) {
 cfg.servers = cfg.servers || {};
 cfg.servers.honcho = {
   type: "stdio",
-  command: "bun",
+  command: bun,
   args: ["run", root + "/mcp-server.ts"],
   env: { HONCHO_HOST: "jcode" },
   shared: true,
 };
 fs.writeFileSync(path, JSON.stringify(cfg, null, 2) + "\n");
-' "$MCP_JSON" "$ROOT"
+' "$MCP_JSON" "$ROOT" "$BUN"
 }
-if [ "$DRY" = 1 ]; then say "  would: register servers.honcho (stdio, $ROOT/mcp-server.ts)"; else merge_mcp; fi
+if [ "$DRY" = 1 ]; then say "  would: register servers.honcho (stdio, $BUN run $ROOT/mcp-server.ts)"; else merge_mcp; fi
 say ""
 
 # --- config.toml hooks ----------------------------------------------------
@@ -70,12 +74,14 @@ say "hooks -> $CONFIG_TOML"
 merge_hooks() {
   bun -e '
 const fs = require("fs");
-const [path, root] = process.argv.slice(1);
+const [path, root, bun] = process.argv.slice(1);
 let text = fs.existsSync(path) ? fs.readFileSync(path, "utf-8") : "";
 const H = root + "/hooks-jcode";
 // One bridge, argument-dispatched. Absolute paths because Jcode does not expand
-// ${...} inside hook command strings.
-const bridgeFor = (name) => "bun run " + H + "/bridge.ts " + name;
+// ${...} inside hook command strings and runs them without a shell or login PATH.
+// Jcode parses the command shell-style, so quote any path containing spaces.
+const q = (s) => (/[\s"\\]/.test(s) ? JSON.stringify(s) : s);
+const bridgeFor = (name) => q(bun) + " run " + q(H + "/bridge.ts") + " " + name;
 const want = {
   session_start: bridgeFor("session-start"),
   session_end:   bridgeFor("session-end"),
@@ -103,9 +109,9 @@ if (headerIdx >= 0) {
 let out = Array.isArray(lines) ? lines.join("\n") : lines;
 out = out.replace(/\n{3,}/g, "\n\n").replace(/\s*$/, "") + "\n";
 fs.writeFileSync(path, out);
-' "$CONFIG_TOML" "$ROOT"
+' "$CONFIG_TOML" "$ROOT" "$BUN"
 }
-if [ "$DRY" = 1 ]; then say "  would: set [hooks] session_start / session_end / turn_end / post_tool"; else merge_hooks; fi
+if [ "$DRY" = 1 ]; then say "  would: set [hooks] session_start / session_end / turn_start / turn_end / post_tool"; else merge_hooks; fi
 say ""
 
 # --- skills ---------------------------------------------------------------
