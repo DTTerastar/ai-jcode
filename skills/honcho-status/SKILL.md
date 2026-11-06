@@ -26,5 +26,5 @@ After running the script, present a concise status card echoing the runner outpu
 ## Implementation
 
 ```bash
-bun run "${HONCHO_PLUGIN_ROOT:-$HOME/Code/ai-jcode}/src/skills/status-runner.ts"
+bun run "${HONCHO_PLUGIN_ROOT:-$HOME/Code/jcode-honcho}/src/skills/status-runner.ts"
 ```

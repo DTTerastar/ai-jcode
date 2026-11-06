@@ -1,4 +1,4 @@
-# DTTerastar/ai-jcode
+# DTTerastar/jcode-honcho
 
 Jcode plugins and skills. Fork of [DTTerastar/ai](https://github.com/DTTerastar/ai)
 (a fork of [plastic-labs/claude-honcho](https://github.com/plastic-labs/claude-honcho), MIT),
@@ -14,8 +14,8 @@ any self-hosted instance; no deployment URL is baked in.
 ## Install
 
 ```bash
-git clone https://github.com/DTTerastar/ai-jcode ~/Code/ai-jcode
-~/Code/ai-jcode/install.sh
+git clone https://github.com/DTTerastar/jcode-honcho ~/Code/jcode-honcho
+~/Code/jcode-honcho/install.sh
 ```
 
 `install.sh` is idempotent. It writes:

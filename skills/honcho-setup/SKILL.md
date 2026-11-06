@@ -16,13 +16,13 @@ checks for an API key (env var, then `~/.honcho/config.json`), validates the
 connection, writes the config, and installs the memory statusLine:
 
 ```bash
-bun run "${HONCHO_PLUGIN_ROOT:-$HOME/Code/ai-jcode}/src/skills/setup-runner.ts"
+bun run "${HONCHO_PLUGIN_ROOT:-$HOME/Code/jcode-honcho}/src/skills/setup-runner.ts"
 ```
 
 If `HONCHO_PLUGIN_ROOT` isn't set, point it at the clone:
 
 ```bash
-export HONCHO_PLUGIN_ROOT="$HOME/Code/ai-jcode"
+export HONCHO_PLUGIN_ROOT="$HOME/Code/jcode-honcho"
 ```
 
 **API key:** only needed if the target instance has AUTH enabled. If the runner

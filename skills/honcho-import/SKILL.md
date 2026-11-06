@@ -32,13 +32,13 @@ The user may specify scope in natural language; translate it to flags:
 Run the importer in dry-run mode and show the user the plan:
 
 ```bash
-bun run "${HONCHO_PLUGIN_ROOT:-$HOME/Code/ai-jcode}/src/skills/backfill-runner.ts" --dry-run
+bun run "${HONCHO_PLUGIN_ROOT:-$HOME/Code/jcode-honcho}/src/skills/backfill-runner.ts" --dry-run
 ```
 
 If `HONCHO_PLUGIN_ROOT` isn't set, point it at the clone:
 
 ```bash
-export HONCHO_PLUGIN_ROOT="$HOME/Code/ai-jcode"
+export HONCHO_PLUGIN_ROOT="$HOME/Code/jcode-honcho"
 ```
 
 Report the workspace, session count, and message count. Note that any sessions
@@ -54,7 +54,7 @@ Ask the user to confirm before uploading. **Do not upload without an explicit ye
 On confirmation, run the real import (add `--days`/`--workspace` if the user asked):
 
 ```bash
-bun run "${HONCHO_PLUGIN_ROOT:-$HOME/Code/ai-jcode}/src/skills/backfill-runner.ts" --yes
+bun run "${HONCHO_PLUGIN_ROOT:-$HOME/Code/jcode-honcho}/src/skills/backfill-runner.ts" --yes
 ```
 
 ### 4. Report

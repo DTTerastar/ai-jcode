@@ -1,5 +1,5 @@
 {
-  "name": "ai-jcode",
+  "name": "jcode-honcho",
   "version": "0.2.11-jcode.1",
   "description": "Honcho persistent memory for Jcode \u2014 MCP tools, lifecycle hooks, and skills (port of plastic-labs/claude-honcho)",
   "type": "module",
