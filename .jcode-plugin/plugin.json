@@ -1,0 +1,20 @@
+{
+  "name": "honcho",
+  "version": "0.2.11-jcode.1",
+  "description": "Persistent memory for Jcode sessions using Honcho (port of plastic-labs/claude-honcho)",
+  "author": {
+    "name": "DTTerastar (fork of Plastic Labs)"
+  },
+  "homepage": "https://github.com/plastic-labs/claude-honcho",
+  "repository": "https://github.com/DTTerastar/jcode-honcho",
+  "license": "MIT",
+  "keywords": [
+    "memory",
+    "context",
+    "honcho",
+    "jcode"
+  ],
+  "mcpServers": "./mcp-servers.json",
+  "hooks": "./hooks-jcode/hooks.json",
+  "skills": "./skills/"
+}

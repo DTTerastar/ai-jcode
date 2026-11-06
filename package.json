@@ -1,0 +1,33 @@
+{
+  "name": "jcode-honcho",
+  "version": "0.2.11-jcode.1",
+  "description": "Honcho persistent memory for Jcode \u2014 MCP tools, lifecycle hooks, and skills (port of plastic-labs/claude-honcho)",
+  "type": "module",
+  "keywords": [
+    "jcode",
+    "honcho",
+    "memory",
+    "context",
+    "agents",
+    "llm"
+  ],
+  "author": "DTTerastar",
+  "license": "MIT",
+  "dependencies": {
+    "@honcho-ai/harness-plugin-core": "^0.1.0",
+    "@honcho-ai/sdk": "^2.1.0",
+    "@modelcontextprotocol/sdk": "^1.26.0"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "typescript": "^5.0.0"
+  },
+  "scripts": {
+    "mcp": "bun run mcp-server.ts",
+    "session-start": "bun run hooks-jcode/bridge.ts session-start",
+    "turn-start": "bun run hooks-jcode/bridge.ts turn-start",
+    "turn-end": "bun run hooks-jcode/bridge.ts turn-end",
+    "status": "bun run src/skills/status-runner.ts",
+    "typecheck": "tsc --noEmit"
+  }
+}

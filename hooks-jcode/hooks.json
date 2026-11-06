@@ -1,0 +1,20 @@
+{
+  "description": "Honcho memory hooks for Jcode sessions (Jcode lifecycle -> Honcho handlers)",
+  "hooks": {
+    "session_start": [
+      "bun run ${HONCHO_PLUGIN_ROOT}/hooks-jcode/bridge.ts session-start"
+    ],
+    "session_end": [
+      "bun run ${HONCHO_PLUGIN_ROOT}/hooks-jcode/bridge.ts session-end"
+    ],
+    "turn_start": [
+      "bun run ${HONCHO_PLUGIN_ROOT}/hooks-jcode/bridge.ts turn-start"
+    ],
+    "turn_end": [
+      "bun run ${HONCHO_PLUGIN_ROOT}/hooks-jcode/bridge.ts turn-end"
+    ],
+    "post_tool": [
+      "bun run ${HONCHO_PLUGIN_ROOT}/hooks-jcode/bridge.ts post-tool"
+    ]
+  }
+}
