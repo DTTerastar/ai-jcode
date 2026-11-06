@@ -1,0 +1,8 @@
+{
+  "honcho": {
+    "type": "stdio",
+    "command": "bun",
+    "args": ["run", "${HONCHO_PLUGIN_ROOT}/mcp-server.ts"],
+    "env": { "HONCHO_HOST": "jcode" }
+  }
+}

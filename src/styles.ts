@@ -1,0 +1,201 @@
+/**
+ * Shared color scheme and styling utilities for honcho CLI
+ *
+ * Design principles:
+ * - No emojis, only tasteful Unicode symbols
+ * - Orange to pale light blue gradient
+ * - Consistent hierarchy: headers, labels, values, dim text
+ */
+
+import { readFileSync } from "fs";
+import { homedir } from "os";
+import { join } from "path";
+
+// ANSI color codes - orange to pale light blue gradient
+export const colors = {
+  reset: "\x1b[0m",
+  bold: "\x1b[1m",
+  dim: "\x1b[2m",
+
+  // Primary gradient: orange → pale blue
+  orange: "\x1b[38;5;208m",
+  lightOrange: "\x1b[38;5;214m",
+  peach: "\x1b[38;5;215m",
+  palePeach: "\x1b[38;5;223m",
+  paleBlue: "\x1b[38;5;195m",
+  lightBlue: "\x1b[38;5;159m",
+  skyBlue: "\x1b[38;5;117m",
+  brightBlue: "\x1b[38;5;81m",
+
+  // Semantic colors
+  success: "\x1b[38;5;114m",  // green
+  error: "\x1b[38;5;203m",    // red
+  warn: "\x1b[38;5;214m",     // light orange (warning)
+
+  // Utility
+  white: "\x1b[38;5;255m",
+  gray: "\x1b[38;5;245m",
+};
+
+// Unicode symbols generated at runtime (survives bundling)
+export const symbols = {
+  check: String.fromCodePoint(0x2713),      // ✓
+  cross: String.fromCodePoint(0x2717),      // ✗
+  dot: String.fromCodePoint(0x00B7),        // ·
+  bullet: String.fromCodePoint(0x2022),     // •
+  arrow: String.fromCodePoint(0x2192),      // →
+  line: String.fromCodePoint(0x2500),       // ─
+  corner: String.fromCodePoint(0x2514),     // └
+  pipe: String.fromCodePoint(0x2502),       // │
+  sparkle: String.fromCodePoint(0x2726),    // ✦
+};
+
+/**
+ * Style a header/title
+ */
+export function header(text: string): string {
+  const line = symbols.line.repeat(text.length);
+  return `${colors.orange}${text}${colors.reset}\n${colors.dim}${line}${colors.reset}`;
+}
+
+/**
+ * Style a section header (smaller than main header)
+ */
+export function section(text: string): string {
+  return `${colors.lightBlue}${text}${colors.reset}`;
+}
+
+/**
+ * Style a label (for key-value pairs)
+ */
+export function label(text: string): string {
+  return `${colors.skyBlue}${text}${colors.reset}`;
+}
+
+/**
+ * Style a value
+ */
+export function value(text: string): string {
+  return `${colors.white}${text}${colors.reset}`;
+}
+
+/**
+ * Style dim/secondary text
+ */
+export function dim(text: string): string {
+  return `${colors.dim}${text}${colors.reset}`;
+}
+
+/**
+ * Style a success message
+ */
+export function success(message: string): string {
+  return `${colors.success}${symbols.check}${colors.reset} ${message}`;
+}
+
+/**
+ * Style an error message
+ */
+export function error(message: string): string {
+  return `${colors.error}${symbols.cross}${colors.reset} ${message}`;
+}
+
+/**
+ * Style a warning message
+ */
+export function warn(message: string): string {
+  return `${colors.warn}!${colors.reset} ${message}`;
+}
+
+/**
+ * Style a list item
+ */
+export function listItem(text: string, indent: number = 0): string {
+  const padding = "  ".repeat(indent);
+  return `${padding}${colors.dim}${symbols.bullet}${colors.reset} ${text}`;
+}
+
+/**
+ * Style a key-value pair
+ */
+export function keyValue(key: string, val: string): string {
+  return `${label(key)}: ${value(val)}`;
+}
+
+/**
+ * Style current/active item marker
+ */
+export function current(text: string): string {
+  return `${colors.palePeach}(${text})${colors.reset}`;
+}
+
+/**
+ * Create a horizontal rule
+ */
+export function hr(width: number = 40): string {
+  return `${colors.dim}${symbols.line.repeat(width)}${colors.reset}`;
+}
+
+/**
+ * Style a path
+ */
+export function path(p: string): string {
+  return `${colors.gray}${p}${colors.reset}`;
+}
+
+/**
+ * Highlight text
+ */
+export function highlight(text: string): string {
+  return `${colors.peach}${text}${colors.reset}`;
+}
+
+/**
+ * Build a dashboard URL for a session.
+ *
+ * Honours `dashboardUrl` in ~/.honcho/config.json (or `HONCHO_DASHBOARD_URL`)
+ * so self-hosted deployments link to their own dashboard instead of
+ * app.honcho.dev. No deployment is hardcoded: with neither set, links point at
+ * the hosted app.
+ */
+const HOSTED_DASHBOARD = "https://app.honcho.dev";
+let _dashboardBase: string | undefined;
+function configuredDashboardBase(): string {
+  if (_dashboardBase !== undefined) return _dashboardBase;
+  const env = process.env.HONCHO_DASHBOARD_URL?.trim();
+  if (env) {
+    _dashboardBase = env.replace(/\/+$/, "");
+    return _dashboardBase;
+  }
+  try {
+    const raw = JSON.parse(readFileSync(join(homedir(), ".honcho", "config.json"), "utf-8"));
+    _dashboardBase = typeof raw.dashboardUrl === "string" && raw.dashboardUrl.trim()
+      ? raw.dashboardUrl.trim().replace(/\/+$/, "")
+      : HOSTED_DASHBOARD;
+  } catch {
+    _dashboardBase = HOSTED_DASHBOARD;
+  }
+  return _dashboardBase ?? HOSTED_DASHBOARD;
+}
+
+export function honchoSessionUrl(workspace: string, _sessionName: string): string {
+  // Deep-link scheme differs between dashboards, so link to the dashboard root
+  // with the workspace encoded rather than guessing a per-deployment route.
+  const base = configuredDashboardBase();
+  return `${base}/?ws=${encodeURIComponent(workspace)}`;
+}
+
+/**
+ * OSC 8 terminal hyperlink (clickable in supported terminals)
+ */
+export function hyperlink(url: string, text: string): string {
+  return `\x1b]8;;${url}\x07${text}\x1b]8;;\x07`;
+}
+
+/**
+ * Styled session line with clickable hyperlink to Honcho app
+ */
+export function sessionLine(workspace: string, sessionName: string): string {
+  const url = honchoSessionUrl(workspace, sessionName);
+  return `${colors.dim}Honcho session:${colors.reset} ${hyperlink(url, `${colors.skyBlue}${sessionName}${colors.reset}`)}`;
+}
